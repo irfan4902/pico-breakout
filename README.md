@@ -8,5 +8,3 @@ The task is to complete the breakout_task.py program to handle collisions with t
 The solution to this problem can be found in breakout_solution.py.
 
 Thank you for playing!
-
-![Pico Display with the game running on it :D](https://github.com/irfan4902/breakout/blob/main/pico.jpg)
