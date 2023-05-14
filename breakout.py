@@ -1,5 +1,6 @@
 import time
 from pimoroni import Button
+from pimoroni import RGBLED
 from picographics import PicoGraphics, DISPLAY_PICO_DISPLAY, PEN_P4
 
 display = PicoGraphics(display=DISPLAY_PICO_DISPLAY, pen_type=PEN_P4, rotate=0)
@@ -35,7 +36,8 @@ class Ball():
         self.radius = 5
         self.x_velocity = 0
         self.y_velocity = 0
-        self.colour = RED  
+        self.colour = RED
+        self.speed = 5
 
 class Block():
     def __init__(self, x, y):
@@ -48,6 +50,15 @@ class Block():
         self.destroyed = False
 
 # Render functions
+def renderBlocks():
+    for block in blocks:
+        if (not block.destroyed):
+            display.set_pen(block.colour)
+            display.rectangle(block.x, block.y, block.width, block.height)
+        else:
+            display.set_pen(BG)
+            display.rectangle(block.x, block.y, block.width, block.height)
+
 def renderPaddle(obj):
     display.set_pen(obj.colour)
     display.rectangle(int(obj.x), int(obj.y), obj.width, obj.height)
@@ -57,15 +68,6 @@ def renderBall(obj):
     display.circle(int(obj.x), int(obj.y), obj.radius)
     obj.x += obj.x_velocity
     obj.y += obj.y_velocity
-
-def renderBlocks():
-    for block in blocks:
-        if (not block.destroyed):
-            display.set_pen(block.colour)
-            display.rectangle(block.x, block.y, block.width, block.height)
-        else:
-            display.set_pen(BG)
-            display.rectangle(block.x, block.y, block.width, block.height)
 
 def movePaddle():
     if btn_y.read():
@@ -129,8 +131,7 @@ while True:
         renderBlocks()
         
         if btn_a.read():
-            ball.y_velocity = -2
-            ball.x_velocity = 0.5
+            ball.y_velocity = -ball.speed
             break
         
         display.update()
@@ -153,15 +154,26 @@ while True:
         if ball.y < ymin:
             ball.y_velocity *= -1
         
+        # Check if the ball is colliding with the paddle
         if (ball.y >= paddle.y-paddle.height) and (paddle.x <= ball.x <= paddle.x + paddle.width):
+            #Make the ball go up
             ball.y_velocity *= -1
+            
+            # If the ball hits the left side of the paddle, make the ball go left
+            if (paddle.x <= ball.x <= paddle.x + paddle.width/2):
+                ball.x_velocity = -2
+                
+            # If the ball hits the right side of the paddle, make the ball go right
+            if ( (paddle.x + paddle.width/2) <= ball.x <= (paddle.x + paddle.width) ):
+                ball.x_velocity = 2
         
+        # Check if the ball is colliding with a block
         for block in blocks:
             if (block.x <= ball.x <= block.x+block.width) and (block.y <= ball.y <= block.y+block.height) and (not block.destroyed):
                 block.destroyed = True
                 ball.y_velocity *= -1
                 ball.x_velocity *= -1
-        
+                
         renderBlocks()
         renderPaddle(paddle)
         renderBall(ball)
@@ -173,6 +185,6 @@ while True:
             break
         
         display.update()
-        time.sleep(0.01)	
+        time.sleep(0.01)
     
     
