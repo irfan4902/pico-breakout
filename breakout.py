@@ -101,6 +101,8 @@ while True:
         else:
             display.set_pen(GREEN)
             display.text("Congratulations!", 5, 5, scale=2)
+            display.set_pen(WHITE)
+            display.text("Press A to play again", 5, 45, scale=2)
             display.update()
             if btn_a.read():
                 break
@@ -193,6 +195,7 @@ while True:
         if btn_x.read():
             display.set_pen(BG)
             display.clear()
+            victory = False
             break
         
         # If all blocks are destroyed, exit to Menu 
