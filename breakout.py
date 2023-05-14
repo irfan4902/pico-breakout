@@ -67,100 +67,112 @@ def renderBlocks():
             display.set_pen(BG)
             display.rectangle(block.x, block.y, block.width, block.height)
 
-# Create ball and paddle
-lol = Paddle()
-ball = Ball(lol.x + (lol.width / 2), lol.y - 15)
-
-# Create all the blocks
-blocks = []
-blocks.append(Block(15,5))
-blocks.append(Block(50,5))
-blocks.append(Block(85,5))
-blocks.append(Block(120,5))
-blocks.append(Block(155,5))
-blocks.append(Block(190,5))
-
-blocks.append(Block(15,25))
-blocks.append(Block(50,25))
-blocks.append(Block(85,25))
-blocks.append(Block(120,25))
-blocks.append(Block(155,25))
-blocks.append(Block(190,25))
-
-blocks.append(Block(15,45))
-blocks.append(Block(50,45))
-blocks.append(Block(85,45))
-blocks.append(Block(120,45))
-blocks.append(Block(155,45))
-blocks.append(Block(190,45))
-
-# Game loop before the game starts
-while True:
-    display.set_pen(BG)
-    display.clear()
-    
+def movePaddle():
     if btn_y.read():
-        lol.x += lol.speed
+        paddle.x += paddle.speed
     
     if btn_b.read():
-        lol.x -= lol.speed
-    
-    ball.x = lol.x + (lol.width / 2)
-    
-    renderPaddle(lol)
-    renderBall(ball)
-    renderBlocks()
-    
-    if btn_a.read():
-        ball.y_velocity = -2
-        ball.x_velocity = 0.5
-        break
-    
-    display.update()
-    time.sleep(0.01)
+        paddle.x -= paddle.speed
 
-# Game loop when the game starts
+# Program Loop
 while True:
-    display.set_pen(BG)
-    display.clear()
+    
+    # Main Menu Loop
+    while True:
+        display.set_pen(WHITE)
+        display.text("Untitled Breakout Game", 5, 5, scale=2)
+        display.text("Buttons B and Y to move", 5, 25, scale=2)
+        display.text("Button A to start", 5, 45, scale=2)
+        display.text("Button X to quit", 5, 65, scale=2)
+        display.update()
+        if btn_a.read():
+            break
 
-    if btn_y.read():
-        lol.x += lol.speed
-    
-    if btn_b.read():
-        lol.x -= lol.speed
-    
-    xmax = WIDTH - ball.radius
-    xmin = ball.radius
-    ymax = HEIGHT - ball.radius
-    ymin = ball.radius
+    # Create ball and paddle
+    paddle = Paddle()
+    ball = Ball(paddle.x + (paddle.width / 2), paddle.y - 15)
 
-    if ball.x < xmin or ball.x > xmax:
-        ball.x_velocity *= -1
+    # Create all the blocks
+    blocks = []
+    blocks.append(Block(15,5))
+    blocks.append(Block(50,5))
+    blocks.append(Block(85,5))
+    blocks.append(Block(120,5))
+    blocks.append(Block(155,5))
+    blocks.append(Block(190,5))
 
-    if ball.y < ymin:
-        ball.y_velocity *= -1
-    
-    if (ball.y >= lol.y-lol.height) and (lol.x <= ball.x <= lol.x + lol.width):
-        ball.y_velocity *= -1
-    
-    for block in blocks:
-        if (block.x <= ball.x <= block.x+block.width) and (block.y <= ball.y <= block.y+block.height) and (not block.destroyed):
-            block.destroyed = True
-            ball.y_velocity *= -1
+    blocks.append(Block(15,25))
+    blocks.append(Block(50,25))
+    blocks.append(Block(85,25))
+    blocks.append(Block(120,25))
+    blocks.append(Block(155,25))
+    blocks.append(Block(190,25))
+
+    blocks.append(Block(15,45))
+    blocks.append(Block(50,45))
+    blocks.append(Block(85,45))
+    blocks.append(Block(120,45))
+    blocks.append(Block(155,45))
+    blocks.append(Block(190,45))
+
+    # Game loop before the game starts
+    while True:
+        display.set_pen(BG)
+        display.clear()
+        
+        movePaddle()
+        
+        ball.x = paddle.x + (paddle.width / 2)
+        
+        renderPaddle(paddle)
+        renderBall(ball)
+        renderBlocks()
+        
+        if btn_a.read():
+            ball.y_velocity = -2
+            ball.x_velocity = 0.5
+            break
+        
+        display.update()
+        time.sleep(0.01)
+
+    # Game loop when the game starts
+    while True:
+        display.set_pen(BG)
+        display.clear()
+
+        movePaddle()
+        
+        xmax = WIDTH - ball.radius
+        xmin = ball.radius
+        ymin = ball.radius
+
+        if ball.x < xmin or ball.x > xmax:
             ball.x_velocity *= -1
-    
-    renderBlocks()
-    renderPaddle(lol)
-    renderBall(ball)
-    display.update()
-    time.sleep(0.01)
-    
-    
-    
-    
-    
-    
-    
+
+        if ball.y < ymin:
+            ball.y_velocity *= -1
+        
+        if (ball.y >= paddle.y-paddle.height) and (paddle.x <= ball.x <= paddle.x + paddle.width):
+            ball.y_velocity *= -1
+        
+        for block in blocks:
+            if (block.x <= ball.x <= block.x+block.width) and (block.y <= ball.y <= block.y+block.height) and (not block.destroyed):
+                block.destroyed = True
+                ball.y_velocity *= -1
+                ball.x_velocity *= -1
+        
+        renderBlocks()
+        renderPaddle(paddle)
+        renderBall(ball)
+        
+        # Exit to Main Menu
+        if btn_x.read():
+            display.set_pen(BG)
+            display.clear()
+            break
+        
+        display.update()
+        time.sleep(0.01)	
     
     
