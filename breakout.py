@@ -50,8 +50,6 @@ class Block():
         self.colour = BLUE
         self.destroyed = False
 
-victory = False
-
 # Render functions
 def renderBlocks():
     for block in blocks:
@@ -79,17 +77,24 @@ def movePaddle():
     if btn_b.read():
         paddle.x -= paddle.speed
 
+def clearBG():
+    display.set_pen(BG)
+    display.clear()
+
+victory = False
+
 # Program Loop
 while True:
     
-    # Main Menu Loop
+    # Menu Loop
     while True:
         if not victory:
-            display.set_pen(WHITE)
+            display.set_pen(GREEN)
             display.text("Untitled Breakout Game", 5, 5, scale=2)
-            display.text("Buttons B and Y to move", 5, 25, scale=2)
-            display.text("Button A to start", 5, 45, scale=2)
-            display.text("Button X to quit", 5, 65, scale=2)
+            display.set_pen(WHITE)
+            display.text("Buttons B and Y to move", 5, 45, scale=2)
+            display.text("Button A to start", 5, 65, scale=2)
+            display.text("Button X to quit", 5, 85, scale=2)
             display.update()
             if btn_a.read():
                 break
@@ -129,17 +134,16 @@ while True:
 
     # Game loop before the game starts
     while True:
-        display.set_pen(BG)
-        display.clear()
-        
+        clearBG()
         movePaddle()
-        
-        ball.x = paddle.x + (paddle.width / 2)
-        
         renderPaddle(paddle)
         renderBall(ball)
         renderBlocks()
         
+        # Hover the ball over the paddle
+        ball.x = paddle.x + (paddle.width / 2)
+        
+        # Press A to start the game
         if btn_a.read():
             ball.y_velocity = -ball.speed
             break
@@ -149,24 +153,24 @@ while True:
 
     # Game loop when the game starts
     while True:
-        display.set_pen(BG)
-        display.clear()
-
+        clearBG()
         movePaddle()
+        renderBlocks()
+        renderPaddle(paddle)
+        renderBall(ball)
         
+        # Make sure the ball bounces of the walls
         xmax = WIDTH - ball.radius
         xmin = ball.radius
         ymin = ball.radius
-
         if ball.x < xmin or ball.x > xmax:
             ball.x_velocity *= -1
-
         if ball.y < ymin:
             ball.y_velocity *= -1
         
         # Check if the ball is colliding with the paddle
         if (ball.y >= paddle.y-paddle.height) and (paddle.x <= ball.x <= paddle.x + paddle.width):
-            #Make the ball go up
+            # Make the ball move upwards
             ball.y_velocity *= -1
             
             # If the ball hits the left side of the paddle, make the ball go left
@@ -184,17 +188,14 @@ while True:
                 ball.y_velocity *= -1
                 ball.x_velocity *= -1
                 blocks.remove(block)
-                
-        renderBlocks()
-        renderPaddle(paddle)
-        renderBall(ball)
         
-        # Exit to Main Menu
+        # Exit to Menu
         if btn_x.read():
             display.set_pen(BG)
             display.clear()
             break
         
+        # If all blocks are destroyed, exit to Menu 
         if not blocks:
             display.set_pen(BG)
             display.clear()
