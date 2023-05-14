@@ -14,6 +14,7 @@ BG = display.create_pen(40, 40, 40)
 WHITE = display.create_pen(255, 255, 255)
 RED = display.create_pen(255, 0, 0)
 BLUE = display.create_pen(0, 0, 255)
+GREEN = display.create_pen(0, 255, 0)
 
 btn_a = Button(12)
 btn_b = Button(13)
@@ -49,6 +50,8 @@ class Block():
         self.colour = BLUE
         self.destroyed = False
 
+victory = False
+
 # Render functions
 def renderBlocks():
     for block in blocks:
@@ -81,14 +84,21 @@ while True:
     
     # Main Menu Loop
     while True:
-        display.set_pen(WHITE)
-        display.text("Untitled Breakout Game", 5, 5, scale=2)
-        display.text("Buttons B and Y to move", 5, 25, scale=2)
-        display.text("Button A to start", 5, 45, scale=2)
-        display.text("Button X to quit", 5, 65, scale=2)
-        display.update()
-        if btn_a.read():
-            break
+        if not victory:
+            display.set_pen(WHITE)
+            display.text("Untitled Breakout Game", 5, 5, scale=2)
+            display.text("Buttons B and Y to move", 5, 25, scale=2)
+            display.text("Button A to start", 5, 45, scale=2)
+            display.text("Button X to quit", 5, 65, scale=2)
+            display.update()
+            if btn_a.read():
+                break
+        else:
+            display.set_pen(GREEN)
+            display.text("Congratulations!", 5, 5, scale=2)
+            display.update()
+            if btn_a.read():
+                break
 
     # Create ball and paddle
     paddle = Paddle()
@@ -173,6 +183,7 @@ while True:
                 block.destroyed = True
                 ball.y_velocity *= -1
                 ball.x_velocity *= -1
+                blocks.remove(block)
                 
         renderBlocks()
         renderPaddle(paddle)
@@ -184,7 +195,12 @@ while True:
             display.clear()
             break
         
+        if not blocks:
+            display.set_pen(BG)
+            display.clear()
+            victory = True
+            break
+        
         display.update()
         time.sleep(0.01)
-    
-    
+        
